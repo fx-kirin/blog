@@ -52,52 +52,20 @@ prepare() {
 }
 
 build() {
-  cd ${srcdir}/${pkgname}-${pkgver}
-
-  # ./configure \
-    # --prefix=/usr \
-    # --build=${CHOST} \
-    # --with-features=small \
-    # --with-tlib=ncursesw \
-    # --enable-multibyte \
-    # --disable-luainterp \
-    # --disable-perlinterp \
-    # --disable-pythoninterp \
-    # --disable-python3interp \
-    # --disable-rubyinterp \
-    # --disable-tclinterp \
-    # --disable-gpm --disable-sysmouse \
-    # --disable-gui --without-x \
-    # --with-compiledby="<alexpux@gmail.com>"
-  # make auto/osdef.h
-  # make VIMRCLOC=/etc VIMRUNTIMEDIR=/usr/share/vim/vim${slot/\.} || die "make 2 fail"
-  # mv vim.exe vi.exe
-  # make distclean
-
-  ./configure \
-    --enable-fail-if-missing \
-    --prefix=/usr \
-    --build=${CHOST} \
-    --with-features=huge \
-    --with-tlib=ncursesw \
-    --enable-cscope \
-    --enable-multibyte \
-    --enable-luainterp \
-    --with-lua-prefix=/usr/local \
-    --enable-perlinterp=dynamic \
-    #--enable-pythoninterp=dynamic \
-    --enable-pythoninterp \
-    --with-python-prefix=/mingw32 \
-    --enable-python3interp=dynamic \
-    --enable-rubyinterp=dynamic \
-    --disable-tclinterp \
-    --disable-gpm --disable-sysmouse \
-    --disable-gui --without-x \
-    CPPFLAGS="${CPPFLAGS} -I/usr/include/ncursesw" \
-    --with-compiledby="<alexpux@gmail.com>"
-
-  #make auto/osdef.h
-  make -j1 VIMRCLOC=/etc VIMRUNTIMEDIR=/usr/share/vim/vim${_topver/\.}
+  cd ${srcdir}/${pkgname}-${pkgver}/src
+  mingw32-make -f Make_ming.mak -j1 VIMRCLOC=/etc VIMRUNTIMEDIR=/usr/share/vim/vim74/\.} \
+    GUI=no IME=yes MBYTE=yes ICONV=yes \
+    PYTHON=/c/python27_64 DYNAMIC_PYTHON=yes PYTHON_VER=27 \
+    PYTHON_HOME=/c/python27_64 \
+    PYTHONINC=-I/c/python27_64/include \
+    DYNAMIC_PYTHON_DLL=python27.dll \
+    RUBY=/mingw64 DYNAMIC_RUBY=yes RUBY_VER=23 RUBY_VER_LONG=2.3.0 \
+    LUA=/mingw64 DYNAMIC_LUA=yes LUA_VER=51 \
+    PERL=/mingw64 DYNAMIC_PERL=yes PERL_VER=522 \
+    PERLEXE=/mingw64/bin/perl.exe \
+    PERLLIB=/mingw64/lib/perl5/core_perl \
+    CSCOPE=yes NETBEANS=yes ARCH=x86-64 STATIC_STDCPLUS=yes DEBUG=no \
+    BUILDDIR=./build
 }
 
 check() {
@@ -109,10 +77,9 @@ check() {
 }
 
 package() {
-  cd "${srcdir}"/${pkgname}-${pkgver}
-  make -j1 VIMRCLOC=/etc DESTDIR="${pkgdir}" install
+  cd ${srcdir}/${pkgname}-${pkgver}/src
 
-  make install -j1 \
+  mingw32-make -f Make_ming.mak install -j1 \
     VIMRCLOC=/etc VIMRUNTIMEDIR=/usr/share/vim/vim${_topver/\.} \
     STRIP=: INSTALL_DATA="cp -L" INSTALL_DATA_R="cp -Lr" \
     DESTDIR="${pkgdir}"
